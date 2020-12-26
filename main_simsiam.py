@@ -24,9 +24,15 @@ import torchvision.models as models
 from models.simsiam import SimSiam
 from models.predictionMLP import PredictionMLP
 import torch.nn.functional as F
+from setlogger import get_logger
 
 import moco.loader
 import moco.builder
+
+saved_path = os.path.join("logs/R50e200/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
+if not os.path.exists(saved_path):
+    os.makedirs(saved_path)
+logger = get_logger(os.path.join(saved_path, 'train.log'))
 
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
@@ -274,7 +280,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 'arch': args.arch,
                 'state_dict': model.state_dict(),
                 'optimizer' : optimizer.state_dict(),
-            }, is_best=False, filename='checkpoint_{:04d}.pth.tar'.format(epoch))
+            }, is_best=False, filename=saved_path+'checkpoint_{:04d}.pth.tar'.format(epoch))
 
 
 def train(train_loader, model, optimizer, epoch, args):
@@ -366,7 +372,8 @@ class ProgressMeter(object):
     def display(self, batch):
         entries = [self.prefix + self.batch_fmtstr.format(batch)]
         entries += [str(meter) for meter in self.meters]
-        print('\t'.join(entries))
+        # print('\t'.join(entries))
+        logger.info('\t'.join(entries))
 
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))
