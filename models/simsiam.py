@@ -27,6 +27,14 @@ class SimSiam(nn.Module):
         self.l3 = nn.Linear(d, d)
         self.bn3 = nn.BatchNorm1d(d)
         self.relu = nn.ReLU()
+        # self.l1 = nn.Sequential(
+        #     nn.Linear(num_ftrs, d),
+        #     nn.BatchNorm1d(d),
+        #     nn.ReLU()
+        # )
+        # self.l2 = nn.Sequential(
+        #
+        # )
 
         # prediction MLP
         self.prediction = PredictionMLP()
@@ -37,7 +45,7 @@ class SimSiam(nn.Module):
         # projection
         x = self.relu(self.bn1(self.l1(x)))
         x = self.relu(self.bn2(self.l2(x)))
-        z = self.bn3(self.l2(x))
+        z = self.bn3(self.l3(x))
         # prediction
         p = self.prediction(z)
         return z, p

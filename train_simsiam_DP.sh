@@ -1,5 +1,5 @@
 #!/bin/bash
-python main_simsiam.py \
+python main_simsiam_DP.py \
 --aug-plus \
 --cos \
 -a resnet50 \
