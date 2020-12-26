@@ -51,7 +51,7 @@ parser.add_argument('-b', '--batch-size', default=256, type=int,
                     help='mini-batch size (default: 256), this is the total '
                          'batch size of all GPUs on the current node when '
                          'using Data Parallel or Distributed Data Parallel')
-parser.add_argument('--lr', '--learning-rate', default=0.03, type=float,
+parser.add_argument('--lr', '--learning-rate', default=0.05, type=float,
                     metavar='LR', help='initial learning rate', dest='lr')
 parser.add_argument('--schedule', default=[120, 160], nargs='*', type=int,
                     help='learning rate schedule (when to drop lr by 10x)')
@@ -160,7 +160,6 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
     print("=> creating model '{}'".format(args.arch))
     model = SimSiam(backbone=args.arch)
-    predictionMLP = PredictionMLP()
     print(model)
 
     if args.distributed:
@@ -170,14 +169,12 @@ def main_worker(gpu, ngpus_per_node, args):
         if args.gpu is not None:
             torch.cuda.set_device(args.gpu)
             model.cuda(args.gpu)
-            predictionMLP.cuda(args.gpu)
             # When using a single GPU per process and per
             # DistributedDataParallel, we need to divide the batch size
             # ourselves based on the total number of GPUs we have
             args.batch_size = int(args.batch_size / ngpus_per_node)
             args.workers = int((args.workers + ngpus_per_node - 1) / ngpus_per_node)
             model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
-            predictionMLP = torch.nn.parallel.DistributedDataParallel(predictionMLP, device_ids=[args.gpu])
         else:
             model.cuda()
             # DistributedDataParallel will divide and allocate batch_size to all
@@ -186,7 +183,6 @@ def main_worker(gpu, ngpus_per_node, args):
     elif args.gpu is not None:
         torch.cuda.set_device(args.gpu)
         model = model.cuda(args.gpu)
-        predictionMLP = predictionMLP.cuda(args.gpu)
         # comment out the following line for debugging
         # raise NotImplementedError("Only DistributedDataParallel is supported.")
     else:
@@ -266,9 +262,10 @@ def main_worker(gpu, ngpus_per_node, args):
         if args.distributed:
             train_sampler.set_epoch(epoch)
         adjust_learning_rate(optimizer, epoch, args)
+        print('Lr:', optimizer.param_groups[0]['lr'])
 
         # train for one epoch
-        train(train_loader, model, predictionMLP, optimizer, epoch, args)
+        train(train_loader, model, optimizer, epoch, args)
 
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                 and args.rank % ngpus_per_node == 0):
@@ -280,7 +277,7 @@ def main_worker(gpu, ngpus_per_node, args):
             }, is_best=False, filename='checkpoint_{:04d}.pth.tar'.format(epoch))
 
 
-def train(train_loader, model, prediction, optimizer, epoch, args):
+def train(train_loader, model, optimizer, epoch, args):
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
@@ -306,8 +303,8 @@ def train(train_loader, model, prediction, optimizer, epoch, args):
         # compute output
         # output, target = model(im_q=images[0], im_k=images[1])
         # loss = criterion(output, target)
-        z1, z2 = model(images[0]), model(images[1])
-        p1, p2 = prediction(z1), prediction(z2)
+        z1, p1 = model(images[0])
+        z2, p2 = model(images[1])
         loss = negcos(p1, z2) / 2 + negcos(p2, z1) / 2
 
         # acc1/acc5 are (K+1)-way contrast classifier accuracy

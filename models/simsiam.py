@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
-from models.resnet import resnet50
+# from models.resnet import resnet50
+from torchvision.models import resnet50
+from .predictionMLP import PredictionMLP
 
 
 class SimSiam(nn.Module):
@@ -13,8 +15,9 @@ class SimSiam(nn.Module):
         else:
             raise NotImplementedError('Backbone model not implemented.')
 
-        num_ftrs = net.fc.in_features
-        self.features = nn.Sequential(*list(net.children())[:-1])
+        num_ftrs = net.fc.out_features
+        # self.features = nn.Sequential(*list(net.children())[:-1])
+        self.features = net
 
         # projection MLP
         self.l1 = nn.Linear(num_ftrs, d)
@@ -25,10 +28,16 @@ class SimSiam(nn.Module):
         self.bn3 = nn.BatchNorm1d(d)
         self.relu = nn.ReLU()
 
+        # prediction MLP
+        self.prediction = PredictionMLP()
+
     def forward(self, x):
         x = self.features(x)
-        x = x.view(x.size(0), -1)
+        # x = x.view(x.size(0), -1)
+        # projection
         x = self.relu(self.bn1(self.l1(x)))
         x = self.relu(self.bn2(self.l2(x)))
-        x = self.bn3(self.l2(x))
-        return x
+        z = self.bn3(self.l2(x))
+        # prediction
+        p = self.prediction(z)
+        return z, p

@@ -1,4 +1,4 @@
-# Original code: https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
+# Reference: CutMix repo
 
 import torch.nn as nn
 import math
