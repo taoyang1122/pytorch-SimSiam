@@ -3,7 +3,7 @@ python main_lincls.py \
 -a resnet50 \
 --lr 30.0 \
 --batch-size 256 \
---pretrained log/R50e100/checkpoint_0099.pth.tar \
+--pretrained logs/R50e100/checkpoint_0099.pth.tar \
 --dist-url 'tcp://localhost:10001' \
 --multiprocessing-distributed \
 --world-size 1 \
