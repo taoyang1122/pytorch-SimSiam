@@ -166,7 +166,8 @@ def main_worker(gpu, ngpus_per_node, args):
     # create model
     print("=> creating model '{}'".format(args.arch))
     model = SimSiam(backbone=args.arch)
-    model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
+    if args.distributed:
+        model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
     print(model)
 
     if args.distributed:

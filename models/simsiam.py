@@ -16,9 +16,10 @@ class SimSiam(nn.Module):
         else:
             raise NotImplementedError('Backbone model not implemented.')
 
-        num_ftrs = net.fc.out_features
-        # self.features = nn.Sequential(*list(net.children())[:-1])
-        self.features = net
+        num_ftrs = net.fc.in_features
+        self.features = nn.Sequential(*list(net.children())[:-1])
+        # num_ftrs = net.fc.out_features
+        # self.features = net
 
         # projection MLP
         self.l1 = nn.Linear(num_ftrs, d)
@@ -44,7 +45,7 @@ class SimSiam(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        # x = x.view(x.size(0), -1)
+        x = x.view(x.size(0), -1)
         # projection
         x = self.relu(self.bn1(self.l1(x)))
         x = self.relu(self.bn2(self.l2(x)))
