@@ -3,8 +3,10 @@ python main_simsiam.py \
 --aug-plus \
 --cos \
 -a resnet50 \
+-p 100 \
 --lr 0.05 \
---batch-size 64 \
+--batch-size 256 \
+--epochs 100 \
 --dist-url 'tcp://localhost:10001' \
 --multiprocessing-distributed \
 --world-size 1 \

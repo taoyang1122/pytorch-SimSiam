@@ -29,7 +29,7 @@ from setlogger import get_logger
 import moco.loader
 import moco.builder
 
-saved_path = os.path.join("logs/R50e200/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
+saved_path = os.path.join("logs/R50e100/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
 if not os.path.exists(saved_path):
     os.makedirs(saved_path)
 logger = get_logger(os.path.join(saved_path, 'train.log'))
@@ -271,7 +271,7 @@ def main_worker(gpu, ngpus_per_node, args):
         if args.distributed:
             train_sampler.set_epoch(epoch)
         adjust_learning_rate(optimizer, epoch, args)
-        print('Lr:', optimizer.param_groups[0]['lr'])
+        print('Lr:', optimizer.param_groups[0]['lr'], args.epochs)
 
         # train for one epoch
         train(train_loader, model, optimizer, epoch, args)
