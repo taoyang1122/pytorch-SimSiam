@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import math
 # from models.resnet import resnet50
 from torchvision.models import resnet50
 from .predictionMLP import PredictionMLP
@@ -39,6 +40,8 @@ class SimSiam(nn.Module):
         # prediction MLP
         self.prediction = PredictionMLP()
 
+        self.reset_parameters()
+
     def forward(self, x):
         x = self.features(x)
         # x = x.view(x.size(0), -1)
@@ -49,3 +52,13 @@ class SimSiam(nn.Module):
         # prediction
         p = self.prediction(z)
         return z, p
+
+    def reset_parameters(self):
+        # reset conv initialization to default uniform initialization
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.in_channels
+                stdv = 1. / math.sqrt(n)
+                m.weight.data.uniform_(-stdv, stdv)
+                if m.bias is not None:
+                    m.bias.data.uniform_(-stdv, stdv)
