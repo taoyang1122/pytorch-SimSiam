@@ -1,15 +1,15 @@
-## Exploring simple siamese representation learning
+# Exploring simple siamese representation learning
 
 This is a PyTorch re-implementation of the [SimSiam paper](https://arxiv.org/abs/2011.10566). The implementation is based on the codes of [MOCO](https://github.com/facebookresearch/moco).
 
-# Unsupervised pre-training
+## Unsupervised pre-training
 To run unsupervised pre-training on ImageNet,
 ```
 sh train_simsiam.sh
 ```
 This is to reproduce the results of ```batch-size=256, epoch=100``` setting. Please modify the path to your ImageNet data folder.
 
-# Linear evaluation
+## Linear evaluation
 To run linear evaluation,
 ```
 sh train_lincls.sh
