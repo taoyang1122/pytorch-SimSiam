@@ -16,6 +16,8 @@ sh train_lincls.sh
 ```
 The linear evaluation exactly follows the training setting in MOCO, but it is not the setting used in the paper. In the paper, the author did the linear evaluation with ```batch-size=4096``` which is infeasible to me. According to the paper (Appendix. A), the MOCO setting will give ~1% lower accuracy. My reproduced results and models are given below.
 
+[[Pre-training model]](https://drive.google.com/file/d/1kH4Ge6u-UKEiJ-Nii3X7AI22-FkAUO-p/view?usp=sharing) | [[Linear evaluation model]](https://drive.google.com/file/d/1xbwUceR9WX0uBQWCWnv7HPvdDmuJpbNL/view?usp=sharing)
+
 |SimSiam|batchsize|100 ep|
 |-------|---------|------|
 |Reported|256|~67.0%|
