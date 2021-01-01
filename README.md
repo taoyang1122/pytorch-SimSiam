@@ -20,3 +20,12 @@ The linear evaluation exactly follows the training setting in MOCO, but it is no
 |-------|---------|------|
 |Reported|256|~67.0%|
 |Reproduced|256|64.8%|
+
+## Issues
+Currently, I wasn't able to reproduce the results. I listed some possible issues below. Any discussions are welcomed.
+
+1. During pre-training, I use the R50 backbone with fc layer (out_dime=1000). Currently, I am re-doing the pre-training without the fc layer (output from the pooling layer to the following MLP projection).
+
+2. I used the default R50 initialization in pytorch models, which is different from the paper. I modified the initialization according to the paper and am re-doing the pre-training.
+
+3. The paper didn't say the applying probability of the Blur Augmentation. I am following the setting of MOCO which is p=0.5.
