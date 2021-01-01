@@ -24,7 +24,7 @@ The linear evaluation exactly follows the training setting in MOCO, but it is no
 |Reproduced|256|64.8%|
 
 ## Issues
-Currently, I wasn't able to reproduce the results. I listed some possible issues below. Any discussions are welcomed.
+Currently, I wasn't able to reproduce the results. I listed some possible issues below. Any discussions are welcome.
 
 1. During pre-training, I use the R50 backbone with fc layer (out_dim=1000). Currently, I am re-doing the pre-training without the fc layer (output from the pooling layer to the following MLP projection).
 
