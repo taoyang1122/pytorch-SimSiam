@@ -371,6 +371,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         if i % args.print_freq == 0:
             progress.display(i)
+        break
 
 
 def validate(val_loader, model, criterion, args):
@@ -409,6 +410,7 @@ def validate(val_loader, model, criterion, args):
 
             if i % args.print_freq == 0:
                 progress.display(i)
+            break
 
         # TODO: this should also be done with the ProgressMeter
         logger.info(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
@@ -431,16 +433,14 @@ def sanity_check(state_dict, pretrained_weights):
     print("=> loading '{}' for sanity check".format(pretrained_weights))
     checkpoint = torch.load(pretrained_weights, map_location="cpu")
     state_dict_pre = checkpoint['state_dict']
-
-    for k in list(state_dict.keys()):
+    for k, k_pre in zip(list(state_dict.keys()), list(state_dict_pre.keys())):
         # only ignore fc layer
         if 'fc.weight' in k or 'fc.bias' in k:
             continue
 
         # name in pretrained model
-        k_pre = 'module.features.' + k[len('module.'):] \
-            if k.startswith('module.') else 'module.features.' + k
-
+        # k_pre = 'module.features.' + k[len('module.'):] \
+        #     if k.startswith('module.') else 'module.features.' + k
         assert ((state_dict[k].cpu() == state_dict_pre[k_pre]).all()), \
             '{} is changed in linear classifier training.'.format(k)
 
