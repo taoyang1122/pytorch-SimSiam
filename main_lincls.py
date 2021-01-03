@@ -175,11 +175,14 @@ def main_worker(gpu, ngpus_per_node, args):
             #     del state_dict[k]
             # rename pretrained keys and delete mlp layers
             for k in list(state_dict.keys()):
-                if 'features' in k and not 'fc' in k:
+                if 'features' in k and 'fc' not in k:
                     # remove prefix
                     state_dict[k[len("module.features."):]] = state_dict[k]
                 del state_dict[k]
-
+            # rename pretrained keys
+            for k_state, k_model in zip(list(state_dict.keys()), list(model.state_dict().keys())):
+                state_dict[k_model] = state_dict[k_state]
+                del state_dict[k_state]
             args.start_epoch = 0
             msg = model.load_state_dict(state_dict, strict=False)
             assert set(msg.missing_keys) == {"fc.weight", "fc.bias"}
