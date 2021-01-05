@@ -22,6 +22,7 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 from setlogger import get_logger
 from torchlars import LARS
+# from lars import LARS
 import math
 from models.resnet import resnet50
 
@@ -235,6 +236,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
     optimizer = LARS(base_optimizer)
+    # optimizer = LARS(parameters, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay, eta=0.001, max_epoch=args.epochs)
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -377,7 +379,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         if i % args.print_freq == 0:
             progress.display(i)
-        break
 
 
 def validate(val_loader, model, criterion, args):

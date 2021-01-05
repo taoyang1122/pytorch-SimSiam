@@ -1,8 +1,9 @@
 #!/bin/bash
 python main_lincls.py \
 -a resnet50 \
---lr 0.02 \
+--lr 0.01 \
 --cos \
+--epochs 90 \
 --batch-size 2048 \
 -p 100 \
 --pretrained logs/R50e100_nofc/checkpoint_0099.pth.tar \
