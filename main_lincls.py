@@ -21,12 +21,15 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 from setlogger import get_logger
+from torchlars import LARS
+import math
+from models.resnet import resnet50
 
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
     and callable(models.__dict__[name]))
 
-saved_path = os.path.join("logs/R50e100_lincls/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
+saved_path = os.path.join("logs/R50e100_lincls_lars/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
 if not os.path.exists(saved_path):
     os.makedirs(saved_path)
 logger = get_logger(os.path.join(saved_path, 'train.log'))
@@ -85,6 +88,8 @@ parser.add_argument('--multiprocessing-distributed', action='store_true',
 
 parser.add_argument('--pretrained', default='', type=str,
                     help='path to moco pretrained checkpoint')
+parser.add_argument('--cos', action='store_true',
+                    help='use cosine lr schedule')
 
 best_acc1 = 0
 
@@ -148,8 +153,8 @@ def main_worker(gpu, ngpus_per_node, args):
                                 world_size=args.world_size, rank=args.rank)
     # create model
     print("=> creating model '{}'".format(args.arch))
-    model = models.__dict__[args.arch]()
-
+    # model = models.__dict__[args.arch]()
+    model = resnet50()
     # freeze all layers but the last fc
     for name, param in model.named_parameters():
         if name not in ['fc.weight', 'fc.bias']:
@@ -226,9 +231,10 @@ def main_worker(gpu, ngpus_per_node, args):
     # optimize only the linear classifier
     parameters = list(filter(lambda p: p.requires_grad, model.parameters()))
     assert len(parameters) == 2  # fc.weight, fc.bias
-    optimizer = torch.optim.SGD(parameters, args.lr,
+    base_optimizer = torch.optim.SGD(parameters, args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
+    optimizer = LARS(base_optimizer)
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -371,6 +377,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         if i % args.print_freq == 0:
             progress.display(i)
+        break
 
 
 def validate(val_loader, model, criterion, args):
@@ -490,8 +497,11 @@ class ProgressMeter(object):
 def adjust_learning_rate(optimizer, epoch, args):
     """Decay the learning rate based on schedule"""
     lr = args.lr
-    for milestone in args.schedule:
-        lr *= 0.1 if epoch >= milestone else 1.
+    if args.cos:  # cosine lr schedule
+        lr *= 0.5 * (1. + math.cos(math.pi * epoch / args.epochs))
+    else:
+        for milestone in args.schedule:
+            lr *= 0.1 if epoch >= milestone else 1.
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
