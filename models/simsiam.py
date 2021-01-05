@@ -3,7 +3,49 @@ import torch.nn as nn
 import math
 # from models.resnet import resnet50
 from torchvision.models import resnet50
-from .predictionMLP import PredictionMLP
+
+
+class ProjectionMLP(nn.Module):
+    def __init__(self, in_dim, mid_dim, out_dim):
+        super(ProjectionMLP, self).__init__()
+        self.l1 = nn.Sequential(
+            nn.Linear(in_dim, mid_dim),
+            nn.BatchNorm1d(mid_dim),
+            nn.ReLU(inplace=True)
+        )
+        self.l2 = nn.Sequential(
+            nn.Linear(mid_dim, mid_dim),
+            nn.BatchNorm1d(mid_dim),
+            nn.ReLU(inplace=True)
+        )
+        self.l3 = nn.Sequential(
+            nn.Linear(mid_dim, out_dim),
+            nn.BatchNorm1d(out_dim)
+        )
+
+    def forward(self, x):
+        x = self.l1(x)
+        x = self.l2(x)
+        x = self.l3(x)
+
+        return x
+
+
+class PredictionMLP(nn.Module):
+    def __init__(self, in_dim, mid_dim, out_dim):
+        super(PredictionMLP, self).__init__()
+        self.l1 = nn.Sequential(
+            nn.Linear(in_dim, mid_dim),
+            nn.BatchNorm1d(mid_dim),
+            nn.ReLU(inplace=True)
+        )
+        self.l2 = nn.Linear(mid_dim, out_dim)
+
+    def forward(self, x):
+        x = self.l1(x)
+        x = self.l2(x)
+
+        return x
 
 
 class SimSiam(nn.Module):
@@ -22,24 +64,9 @@ class SimSiam(nn.Module):
         # self.features = net
 
         # projection MLP
-        self.l1 = nn.Linear(num_ftrs, d)
-        self.bn1 = nn.BatchNorm1d(d)
-        self.l2 = nn.Linear(d, d)
-        self.bn2 = nn.BatchNorm1d(d)
-        self.l3 = nn.Linear(d, d)
-        self.bn3 = nn.BatchNorm1d(d)
-        self.relu = nn.ReLU()
-        # self.l1 = nn.Sequential(
-        #     nn.Linear(num_ftrs, d),
-        #     nn.BatchNorm1d(d),
-        #     nn.ReLU()
-        # )
-        # self.l2 = nn.Sequential(
-        #
-        # )
-
+        self.projection = ProjectionMLP(num_ftrs, 2048, 2048)
         # prediction MLP
-        self.prediction = PredictionMLP()
+        self.prediction = PredictionMLP(2048, 512, 2048)
 
         self.reset_parameters()
 
@@ -47,9 +74,7 @@ class SimSiam(nn.Module):
         x = self.features(x)
         x = x.view(x.size(0), -1)
         # projection
-        x = self.relu(self.bn1(self.l1(x)))
-        x = self.relu(self.bn2(self.l2(x)))
-        z = self.bn3(self.l3(x))
+        z = self.projection(x)
         # prediction
         p = self.prediction(z)
         return z, p
