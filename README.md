@@ -14,7 +14,7 @@ To run linear evaluation,
 ```
 sh train_lincls.sh
 ```
-The linear evaluation exactly follows the training setting in MOCO, but it is not the setting used in the paper. In the paper, the author did the linear evaluation with ```batch-size=4096``` which is infeasible to me. According to the paper (Appendix. A), the MOCO setting will give ~1% lower accuracy. My reproduced results and models are given below.
+The linear evaluation is done using LARS optimizer with a batch size of 4096. ```Lr=0.32 (0.02*4096/256)```, ```epoch=90```.
 
 |SimSiam|batchsize|100 ep|
 |-------|---------|------|
