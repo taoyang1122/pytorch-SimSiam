@@ -43,6 +43,7 @@ class LARS(Optimizer):
         defaults = dict(lr=lr, momentum=momentum,
                         weight_decay=weight_decay,
                         eta=eta, max_epoch=max_epoch)
+        print('optimizer config', defaults)
         super(LARS, self).__init__(params, defaults)
 
     def step(self, epoch=None, closure=None):
@@ -82,7 +83,7 @@ class LARS(Optimizer):
                 # Global LR computed on polynomial decay schedule
                 # decay = (1 - float(epoch) / max_epoch) ** 2
                 # global_lr = lr * decay
-                global_lr = lr * 0.5 * (1. + math.cos(math.pi * epoch / max_epoch))
+                global_lr = lr
 
                 # Compute local learning rate for this layer
                 local_lr = eta * weight_norm / \
@@ -96,7 +97,8 @@ class LARS(Optimizer):
                             torch.zeros_like(p.data)
                 else:
                     buf = param_state['momentum_buffer']
-                buf.mul_(momentum).add_(actual_lr, d_p + weight_decay * p.data)
+                # buf.mul_(momentum).add_(actual_lr, d_p + weight_decay * p.data)
+                buf.mul_(momentum).add_(d_p + weight_decay * p.data, alpha=actual_lr)
                 p.data.add_(-buf)
 
         return loss

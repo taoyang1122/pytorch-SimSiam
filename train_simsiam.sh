@@ -11,4 +11,4 @@ python main_simsiam.py \
 --multiprocessing-distributed \
 --world-size 1 \
 --rank 0 \
-/home/ubuntu/yang/data/ImageNet/ILSVRC/Data/CLS-LOC
+/data/ImageNet/CLS-LOC/

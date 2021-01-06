@@ -21,8 +21,8 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 from setlogger import get_logger
-from torchlars import LARS
-# from lars import LARS
+# from torchlars import LARS
+from lars import LARS
 import math
 from models.resnet import resnet50
 
@@ -33,7 +33,7 @@ model_names = sorted(name for name in models.__dict__
 saved_path = os.path.join("logs/R50e100_lincls_lars/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
 if not os.path.exists(saved_path):
     os.makedirs(saved_path)
-logger = get_logger(os.path.join(saved_path, 'train.log'))
+logger = get_logger(os.path.join(saved_path, 'train_correctlr.log'))
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('data', metavar='DIR',
@@ -232,11 +232,11 @@ def main_worker(gpu, ngpus_per_node, args):
     # optimize only the linear classifier
     parameters = list(filter(lambda p: p.requires_grad, model.parameters()))
     assert len(parameters) == 2  # fc.weight, fc.bias
-    base_optimizer = torch.optim.SGD(parameters, args.lr,
-                                momentum=args.momentum,
-                                weight_decay=args.weight_decay)
-    optimizer = LARS(base_optimizer)
-    # optimizer = LARS(parameters, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay, eta=0.001, max_epoch=args.epochs)
+    # base_optimizer = torch.optim.SGD(parameters, args.lr,
+    #                             momentum=args.momentum,
+    #                             weight_decay=args.weight_decay)
+    # optimizer = LARS(base_optimizer)
+    optimizer = LARS(parameters, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay, eta=0.001, max_epoch=args.epochs)
 
     # optionally resume from a checkpoint
     if args.resume:
