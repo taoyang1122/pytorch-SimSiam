@@ -22,7 +22,8 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 from setlogger import get_logger
 # from torchlars import LARS
-from lars import LARS
+# from lars import LARS
+from nvlars import LARC
 import math
 from models.resnet import resnet50
 
@@ -232,11 +233,11 @@ def main_worker(gpu, ngpus_per_node, args):
     # optimize only the linear classifier
     parameters = list(filter(lambda p: p.requires_grad, model.parameters()))
     assert len(parameters) == 2  # fc.weight, fc.bias
-    # base_optimizer = torch.optim.SGD(parameters, args.lr,
-    #                             momentum=args.momentum,
-    #                             weight_decay=args.weight_decay)
-    # optimizer = LARS(base_optimizer)
-    optimizer = LARS(parameters, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay, eta=0.001, max_epoch=args.epochs)
+    base_optimizer = torch.optim.SGD(parameters, args.lr,
+                                momentum=args.momentum,
+                                weight_decay=args.weight_decay)
+    optimizer = LARC(base_optimizer)
+    # optimizer = LARS(parameters, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay, eta=0.001, max_epoch=args.epochs)
 
     # optionally resume from a checkpoint
     if args.resume:
