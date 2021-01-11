@@ -31,7 +31,7 @@ model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
     and callable(models.__dict__[name]))
 
-saved_path = os.path.join("logs/R50e100_lincls_lars/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
+saved_path = os.path.join("logs/R50e100_lincls_nvlars_bs512lr1.6/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
 if not os.path.exists(saved_path):
     os.makedirs(saved_path)
 logger = get_logger(os.path.join(saved_path, 'train_correctlr.log'))
@@ -236,7 +236,7 @@ def main_worker(gpu, ngpus_per_node, args):
     base_optimizer = torch.optim.SGD(parameters, args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
-    optimizer = LARC(base_optimizer)
+    optimizer = LARC(base_optimizer, 0.001, False)
     # optimizer = LARS(parameters, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay, eta=0.001, max_epoch=args.epochs)
 
     # optionally resume from a checkpoint

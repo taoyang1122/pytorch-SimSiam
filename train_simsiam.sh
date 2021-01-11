@@ -4,8 +4,8 @@ python main_simsiam.py \
 --cos \
 -a resnet50 \
 -p 100 \
---lr 0.05 \
---batch-size 256 \
+--lr 0.1 \
+--batch-size 432 \
 --epochs 100 \
 --dist-url 'tcp://localhost:10001' \
 --multiprocessing-distributed \
