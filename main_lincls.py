@@ -21,8 +21,6 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 from setlogger import get_logger
-# from torchlars import LARS
-# from lars import LARS
 from nvlars import LARC
 import math
 from models.resnet import resnet50
@@ -31,7 +29,7 @@ model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
     and callable(models.__dict__[name]))
 
-saved_path = os.path.join("logs/R50e100_lincls_nvlars_bs512lr1.6/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
+saved_path = os.path.join("logs/R50e100_lincls_nvlars_bs512lr1.6/")
 if not os.path.exists(saved_path):
     os.makedirs(saved_path)
 logger = get_logger(os.path.join(saved_path, 'train_correctlr.log'))

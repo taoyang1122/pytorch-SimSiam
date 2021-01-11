@@ -22,7 +22,6 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 from models.simsiam import SimSiam
-from models.predictionMLP import PredictionMLP
 import torch.nn.functional as F
 from setlogger import get_logger
 
