@@ -28,3 +28,6 @@ Note: I first followed the setting in the paper, which is ```Lr=0.32 (0.02*4096/
 |Reproduced|432 ([Model](https://drive.google.com/file/d/1cIkZ9krrjfBh1YAm5X-38N1XLkgRFPhP/view?usp=sharing))|1.6|67.8% ([Model](https://drive.google.com/file/d/1uk_U-I8hiQQiAi5S66fJFqRIoYAEYq7C/view?usp=sharing))|
 |Reproduced|432|0.32|66.0%|
 
+## Acknowledgement
+
+Thank Xinlei for his help on some implementation details.
