@@ -9,7 +9,7 @@ sh train_simsiam.sh
 ```
 This is to do the unsupervised pre-training for 100 epochs. Please modify the path to your ImageNet data folder.
 
-Note 1: I try to follow the setting in the paper, which is bs=512 and lr=0.1 on 8-GPU, but somehow I can not fit it into. So I used the max batch_size that I can fit (432) and keep the lr (0.1).
+Note 1: I try to follow the setting in the paper, which is bs=512 and lr=0.1 on 8-GPU, but somehow I can not fit it. So I used the max batch_size that I can fit (432) while kept the lr unchaged (0.1).
 
 Note 2: In pre-training, I didn't fix the lr of prediction MLP. According to the paper (Table. 1), fixing the lr of prediction MLP can give slightly improvements (67.7% -> 68.1%). You can try it if interested.
 
