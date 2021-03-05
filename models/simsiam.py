@@ -54,7 +54,7 @@ class SimSiam(nn.Module):
         super(SimSiam, self).__init__()
 
         if backbone == 'resnet50':
-            net = resnet50()
+            net = resnet50(zero_init_residual=True)
         else:
             raise NotImplementedError('Backbone model not implemented.')
 
@@ -68,7 +68,7 @@ class SimSiam(nn.Module):
         # prediction MLP
         self.prediction = PredictionMLP(2048, 512, 2048)
 
-        self.reset_parameters()
+        # self.reset_parameters()
 
     def forward(self, x):
         x = self.features(x)
