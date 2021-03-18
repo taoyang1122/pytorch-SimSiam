@@ -28,7 +28,7 @@ from setlogger import get_logger
 import moco.loader
 import moco.builder
 
-saved_path = os.path.join("logs/R50_0.5x_bs256lr0.05/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
+saved_path = os.path.join("logs/R50e100_bs512lr0.1/")#rs56_KDCL_MinLogit_cifar_e250 rs56_5KD_0.4w_cifar_e250
 if not os.path.exists(saved_path):
     os.makedirs(saved_path)
 logger = get_logger(os.path.join(saved_path, 'train.log'))
@@ -45,7 +45,6 @@ parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet50',
                     help='model architecture: ' +
                         ' | '.join(model_names) +
                         ' (default: resnet50)')
-parser.add_argument('--mult', default=1.0, type=float, help='backbone network width')
 parser.add_argument('-j', '--workers', default=32, type=int, metavar='N',
                     help='number of data loading workers (default: 32)')
 parser.add_argument('--epochs', default=200, type=int, metavar='N',
@@ -165,7 +164,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                 world_size=args.world_size, rank=args.rank)
     # create model
     print("=> creating model '{}'".format(args.arch))
-    model = SimSiam(backbone=args.arch, width_mult=args.mult)
+    model = SimSiam(backbone=args.arch)
     if args.distributed:
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
     print(model)
@@ -332,7 +331,7 @@ def train(train_loader, model, optimizer, epoch, args):
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if i % args.print_freq == 0 and args.gpu == 0:
+        if i % args.print_freq == 0:
             progress.display(i)
 
 
