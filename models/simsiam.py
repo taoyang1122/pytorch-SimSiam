@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import math
-# from models.resnet import resnet50
-from torchvision.models import resnet50
+from models.resnet import resnet50
+# from torchvision.models import resnet50
 
 
 class ProjectionMLP(nn.Module):
@@ -50,14 +50,15 @@ class PredictionMLP(nn.Module):
 
 class SimSiam(nn.Module):
 
-    def __init__(self, backbone='resnet50', d=2048):
+    def __init__(self, backbone='resnet50', d=2048, width_mult=1.0):
         super(SimSiam, self).__init__()
 
         if backbone == 'resnet50':
-            net = resnet50(zero_init_residual=True)
+            net = resnet50(zero_init_residual=True, width_mult=width_mult)
         else:
             raise NotImplementedError('Backbone model not implemented.')
-
+        print('Number of backbone parameters: {}'.format(
+            sum([p.data.nelement() for p in net.parameters()])))
         num_ftrs = net.fc.in_features
         self.features = nn.Sequential(*list(net.children())[:-1])
         # num_ftrs = net.fc.out_features
